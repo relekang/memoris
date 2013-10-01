@@ -3,16 +3,17 @@ import redis
 from flask import Flask, request, render_template
 
 from utils import json_response
+from config import CONFIG
 
 app = Flask(__name__)
 
-try:
-    from local import local_config
-    app.config.update(local_config)
-except ImportError:
-    print "Could not import local config"
+app.config.update(CONFIG)
 
-r = redis.Redis(db=app.config['REDIS_DB'])
+r = redis.Redis(
+    db=app.config['REDIS_DB'],
+    host=app.config['REDIS_HOST'],
+    port=app.config['REDIS_PORT']
+)
 
 
 @app.route('/')

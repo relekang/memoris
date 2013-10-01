@@ -1,5 +1,4 @@
 import unittest
-import redis
 import json
 
 import memoris
@@ -11,7 +10,7 @@ class TestViews(unittest.TestCase):
 
     def setUp(self):
         self.app = memoris.app.test_client()
-        self.redis = redis.Redis()
+        self.redis = memoris.r
         self.redis.set('exists', self.EXISTS_VALUE)
 
     def tearDown(self):
