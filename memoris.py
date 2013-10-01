@@ -1,10 +1,15 @@
 import redis
 
-from flask import Flask, request
+from flask import Flask, request, render_template
 
 from utils import json_response
 
 app = Flask(__name__)
+
+
+@app.route('/')
+def index():
+    return render_template('index.jinja2')
 
 
 @app.route('/<key>')
