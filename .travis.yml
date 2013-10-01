@@ -1,0 +1,22 @@
+language: python
+
+python:
+  - "2.6"
+  - "2.7"
+
+env:
+  - DJANGO_VERSION=1.4
+  - DJANGO_VERSION=1.5
+
+install:
+  - pip install -r requirements.txt
+
+script:
+  - flake8
+  - python tests.py
+
+
+before_script:
+  - psql -c 'create database django_nopassword;' -U postgres
+
+after_success: coveralls
