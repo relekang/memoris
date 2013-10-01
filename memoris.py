@@ -1,14 +1,18 @@
 import redis
 
-from flask import request, render_template
+from flask import Flask, request, render_template
 
 from utils import json_response
 
+app = Flask(__name__)
 
+
+@app.route('/')
 def index():
     return render_template('index.jinja2')
 
 
+@app.route('/<key>')
 def api(key):
     r = redis.Redis()
     if request.method == 'POST':
@@ -21,3 +25,5 @@ def api(key):
     return json_response({
         key: value
     })
+if __name__ == '__main__':
+    app.run()
