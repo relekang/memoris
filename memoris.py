@@ -43,5 +43,37 @@ def post_api(key):
         key: value
     })
 
+
+@app.route('/h/<name>')
+def get_hash_all_api(name):
+    return get_hash_api(name)
+
+
+@app.route('/h/<name>/<key>')
+def get_hash_api(name, key=None):
+    if key is None:
+        value = r.hgetall(name)
+    else:
+        value = {key: r.hget(name, key)}
+    if not value:
+        return json_response({'error': 'No value for given key'}, 404)
+
+    return json_response({
+        name: value
+    })
+
+
+@app.route('/h/<name>/<key>', methods=['POST'])
+def post_hash_api(name, key):
+    if request.method == 'POST':
+        r.hset(name, key, request.values.get('value'))
+
+    value = r.hget(name, key)
+
+    return json_response({
+        key: value
+    })
+
+
 if __name__ == '__main__':
     app.run()

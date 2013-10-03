@@ -12,6 +12,7 @@ class TestViews(unittest.TestCase):
         self.app = memoris.app.test_client()
         self.redis = memoris.r
         self.redis.set('exists', self.EXISTS_VALUE)
+        self.redis.hset('hexists', '1', self.EXISTS_VALUE)
 
     def tearDown(self):
         pass
@@ -37,6 +38,26 @@ class TestViews(unittest.TestCase):
         })
         self.assertEquals(response._status_code, 200)
         self.assertEquals(self.redis.get(key), self.EXISTS_VALUE)
+
+    def test_get_hash_api(self):
+        r_existing = self.app.get('/h/hexists')
+        r_non_existing = self.app.get('/h/does-not-exists')
+        self.assertEquals(r_existing._status_code, 200)
+        self.assertEquals(
+            json.loads(r_existing.data)['hexists']['1'],
+            self.EXISTS_VALUE
+        )
+        self.assertEquals(r_non_existing._status_code, 404)
+
+    def test_post_hash_api(self):
+        name = 'a-name'
+        key = 'a-key'
+        response = self.app.post('/h/%s/%s' % (name, key), data={
+            'value': self.EXISTS_VALUE
+        })
+        self.assertEquals(response._status_code, 200)
+        self.assertEquals(self.redis.hget(name, key), self.EXISTS_VALUE)
+
 
 if __name__ == '__main__':
     unittest.main()
