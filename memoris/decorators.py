@@ -12,7 +12,7 @@ def require_token():
         def wrapped(*args, **kwargs):
             token = request.values.get('token')
             if token is None and not token in redis.hgetall('memoris:tokens'):
-                return json_response({'error': 'Token required'}, status=400)
+                return json_response({'error': 'Token required'}, status=403)
             return func(*args, **kwargs)
         return wrapped
     return wrapper
