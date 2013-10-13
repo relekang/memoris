@@ -2,8 +2,9 @@ import redis
 
 from flask import Flask, request, render_template
 
-from utils import json_response
 from config import CONFIG
+from utils import json_response
+from decorators import require_token
 
 app = Flask(__name__)
 
@@ -22,6 +23,7 @@ def index():
 
 
 @app.route('/<key>')
+@require_token()
 def get_api(key):
     value = r.get(key)
     if not value:
@@ -33,6 +35,7 @@ def get_api(key):
 
 
 @app.route('/<key>', methods=['POST'])
+@require_token()
 def post_api(key):
     if request.method == 'POST':
         r.set(key, request.values.get('value'))
@@ -45,11 +48,13 @@ def post_api(key):
 
 
 @app.route('/h/<name>')
+@require_token()
 def get_hash_all_api(name):
     return get_hash_api(name)
 
 
 @app.route('/h/<name>/<key>')
+@require_token()
 def get_hash_api(name, key=None):
     if key is None:
         value = r.hgetall(name)
@@ -64,6 +69,7 @@ def get_hash_api(name, key=None):
 
 
 @app.route('/h/<name>/<key>', methods=['POST'])
+@require_token()
 def post_hash_api(name, key):
     if request.method == 'POST':
         r.hset(name, key, request.values.get('value'))
@@ -74,6 +80,5 @@ def post_hash_api(name, key):
         key: value
     })
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run()

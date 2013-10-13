@@ -1,7 +1,7 @@
 import unittest
 import json
 
-import memoris
+import server
 
 
 class TestViews(unittest.TestCase):
@@ -9,8 +9,8 @@ class TestViews(unittest.TestCase):
     EXISTS_VALUE = 'Yeah, I do'
 
     def setUp(self):
-        self.app = memoris.app.test_client()
-        self.redis = memoris.r
+        self.app = server.app.test_client()
+        self.redis = server.r
         self.redis.set('exists', self.EXISTS_VALUE)
         self.redis.hset('hexists', '1', self.EXISTS_VALUE)
 

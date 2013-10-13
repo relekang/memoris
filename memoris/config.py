@@ -5,7 +5,8 @@ CONFIG = {
 }
 
 try:
-    from local import local_config
-    CONFIG.update(local_config)
+    from local import LOCAL_CONFIG
+    CONFIG.update(LOCAL_CONFIG)
+    print "\nConfig:\n--------\n%s\n" % CONFIG
 except ImportError:
     print "Could not import local config"
