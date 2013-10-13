@@ -13,6 +13,7 @@ class TestViews(unittest.TestCase):
         self.redis = server.r
         self.redis.set('exists', self.EXISTS_VALUE)
         self.redis.hset('hexists', '1', self.EXISTS_VALUE)
+        self.redis.hset('memoris:tokens', 'test', 'A user')
 
     def tearDown(self):
         pass
@@ -22,8 +23,8 @@ class TestViews(unittest.TestCase):
         self.assertEquals(response._status_code, 200)
 
     def test_get_api(self):
-        r_existing = self.app.get('/exists')
-        r_non_existing = self.app.get('/does-not-exists')
+        r_existing = self.app.get('/exists?token=test')
+        r_non_existing = self.app.get('/does-not-exists?token=test')
         self.assertEquals(r_existing._status_code, 200)
         self.assertEquals(
             json.loads(r_existing.data)['exists'],
@@ -33,15 +34,15 @@ class TestViews(unittest.TestCase):
 
     def test_post_api(self):
         key = 'a-key'
-        response = self.app.post('/%s' % key, data={
+        response = self.app.post('/%s?token=test' % key, data={
             'value': self.EXISTS_VALUE
         })
         self.assertEquals(response._status_code, 200)
         self.assertEquals(self.redis.get(key), self.EXISTS_VALUE)
 
     def test_get_hash_api(self):
-        r_existing = self.app.get('/h/hexists')
-        r_non_existing = self.app.get('/h/does-not-exists')
+        r_existing = self.app.get('/h/hexists?token=test')
+        r_non_existing = self.app.get('/h/does-not-exists?token=test')
         self.assertEquals(r_existing._status_code, 200)
         self.assertEquals(
             json.loads(r_existing.data)['hexists']['1'],
@@ -52,12 +53,15 @@ class TestViews(unittest.TestCase):
     def test_post_hash_api(self):
         name = 'a-name'
         key = 'a-key'
-        response = self.app.post('/h/%s/%s' % (name, key), data={
+        response = self.app.post('/h/%s/%s?token=test' % (name, key), data={
             'value': self.EXISTS_VALUE
         })
         self.assertEquals(response._status_code, 200)
         self.assertEquals(self.redis.hget(name, key), self.EXISTS_VALUE)
 
+    def test_require_token(self):
+        response = self.app.get('/key')
+        self.assertEquals(response._status_code, 403)
 
 if __name__ == '__main__':
     unittest.main()
